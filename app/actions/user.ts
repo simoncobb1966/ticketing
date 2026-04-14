@@ -3,7 +3,7 @@
 
 import { db } from "@/db/db";
 import { roles, User, users } from "@/db/schema";
-import { eq, ilike } from "drizzle-orm";
+import { eq, ilike, or } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { NewUser } from "@/types/newUser";
 
@@ -66,7 +66,7 @@ export async function findAllUsers(search: string) {
   const searchPattern = `%${search}%`;
 
   try {
-    const allUsers = await db
+    const foundUsers = await db
       .select({
         id: users.id,
         firstName: users.firstName,
@@ -78,12 +78,13 @@ export async function findAllUsers(search: string) {
       .from(users)
       .leftJoin(roles, eq(users.role, roles.id))
       .where(
-        ilike(users.firstName, searchPattern) ||
-          ilike(users.lastName, searchPattern) ||
-          ilike(users.email, searchPattern),
+        or(
+          ilike(users.firstName, searchPattern),
+          ilike(users.lastName, searchPattern),
+        ),
       );
 
-    return allUsers as User[];
+    return foundUsers as User[];
   } catch (error) {
     console.error("Error fetching users:", error);
     return [] as User[];
