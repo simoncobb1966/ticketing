@@ -8,7 +8,6 @@ import {
 } from "@/app/actions/user";
 import { Button } from "@/components/ui/button";
 import toast from "@/app/components/toast";
-import isEmpty from "lodash/isEmpty";
 import {
   Select,
   SelectContent,
@@ -21,6 +20,7 @@ import {
 import { getAllRoles } from "./actions/roles";
 import { useEffect, useState } from "react";
 import { Role, User } from "@/db/schema";
+import { UserModal } from "./components/userModal";
 
 export default function HomePage() {
   const [users, setUsers] = useState<User[]>([]);
@@ -28,6 +28,7 @@ export default function HomePage() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [selectedRole, setSelectedRole] = useState<string>("");
   const [searchString, setSearchString] = useState<string>("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const upsertUserHandler = async (userData: FormData) => {
     const id: { id?: string } = {};
@@ -166,57 +167,20 @@ export default function HomePage() {
         ))}
       </ul>
 
-      <div className="flex gap-2 mb-6 ">
-        <form
-          action={(data) => upsertUserHandler(data)}
-          className="flex items-center gap-2 mb-6"
-        >
-          <input
-            name="firstName"
-            placeholder="First name..."
-            className="flex-1 border rounded px-3 py-2 text-sm"
-            required
-            defaultValue={selectedUser ? selectedUser.firstName : ""}
-          />
-          <input
-            name="lastName"
-            placeholder="Last name..."
-            className="flex-1 border rounded px-3 py-2 text-sm"
-            required
-            defaultValue={selectedUser ? selectedUser.lastName : ""}
-          />
-          <input
-            name="email"
-            placeholder="email..."
-            className="flex-1 border rounded px-3 py-2 text-sm"
-            required
-            defaultValue={selectedUser ? selectedUser.email : ""}
-          />
-          <Select
-            name="role"
-            value={selectedRole}
-            onValueChange={(value) => setSelectedRole(value)}
-          >
-            <SelectTrigger className="w-full max-w-48">
-              <SelectValue placeholder="Select a role" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Role</SelectLabel>
+      <Button variant="secondary" onClick={() => setIsModalOpen(true)}>
+        Add User
+      </Button>
 
-                {roles.map((role) => (
-                  <SelectItem value={role.id} key={role.id}>
-                    {role.role}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-          <Button disabled={!selectedRole} variant="outline" type="submit">
-            {selectedUser ? "Update" : "Create"}
-          </Button>
-        </form>
-      </div>
+      <UserModal
+        open={isModalOpen}
+        close={() => setIsModalOpen(false)}
+        title={selectedUser ? "Edit User" : "Add User"}
+        upsertUserHandler={upsertUserHandler}
+        selectedUser={selectedUser}
+        roles={roles}
+        selectedRole={selectedRole}
+        setSelectedRole={setSelectedRole}
+      />
     </main>
   );
 }
