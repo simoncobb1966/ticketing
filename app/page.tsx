@@ -94,7 +94,6 @@ export default function HomePage() {
     <main className=" mx-auto mt-16 px-4">
       <h1 className="text-2xl font-semibold mb-6">CRUD Users</h1>
       <p>TODO</p>
-      <p>Toast on delete</p>
       <p>Find user</p>
       <p>Validate inputs</p>
       <p>Testing, start with delete user</p>
