@@ -1,9 +1,14 @@
 "use client";
 
-import { deleteUser, getAllUsers, upsertUser } from "@/app/actions/user";
+import {
+  deleteUser,
+  findAllUsers,
+  getAllUsers,
+  upsertUser,
+} from "@/app/actions/user";
 import { Button } from "@/components/ui/button";
 import toast from "@/app/components/toast";
-
+import isEmpty from "lodash/isEmpty";
 import {
   Select,
   SelectContent,
@@ -22,6 +27,7 @@ export default function HomePage() {
   const [roles, setRoles] = useState<Role[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [selectedRole, setSelectedRole] = useState<string>("");
+  const [searchString, setSearchString] = useState<string>("");
 
   const upsertUserHandler = async (userData: FormData) => {
     const id: { id?: string } = {};
@@ -80,6 +86,20 @@ export default function HomePage() {
     await fetchUsers();
   };
 
+  const searchHandler = async (data: FormData) => {
+    const search = data.get("search") as string;
+    setSearchString(search);
+    const foundUsers = await findAllUsers(search);
+    setUsers(foundUsers);
+  };
+
+  const reset = () => {
+    setSearchString("");
+    setSelectedUser(null);
+    setSelectedRole("");
+    fetchUsers();
+  };
+
   useEffect(() => {
     const fetchUsersAndRoles = async () => {
       await fetchUsers();
@@ -94,13 +114,32 @@ export default function HomePage() {
     <main className=" mx-auto mt-16 px-4">
       <h1 className="text-2xl font-semibold mb-6">CRUD Users</h1>
       <p>TODO</p>
-      <p>Find user</p>
       <p>Validate inputs</p>
       <p>Testing, start with delete user</p>
       <p>Sort by date created/updated</p>
       <p>Soft Delete</p>
       <p>Pagination</p>
       <p>Look at db return values</p>
+      <p>Skeleton</p>
+
+      <form className="flex gap-2 items-center my-2" action={searchHandler}>
+        <input
+          name="search"
+          placeholder="search ..."
+          className="flex-1 border rounded px-3 py-2 text-sm"
+          required
+          defaultValue={""}
+        />
+        <Button variant="outline" type="submit">
+          {"Search"}
+        </Button>
+        <Button variant="outline" type="button" onClick={reset}>
+          {"Reset"}
+        </Button>
+      </form>
+      {searchString && (
+        <p className="my-2">{`Search results for "${searchString}"`}</p>
+      )}
 
       {/* Users list */}
       <ul className="space-y-2 mb-2">

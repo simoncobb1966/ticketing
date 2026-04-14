@@ -3,7 +3,7 @@
 
 import { db } from "@/db/db";
 import { roles, User, users } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, ilike } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { NewUser } from "@/types/newUser";
 
@@ -60,4 +60,32 @@ export async function deleteUser(id: string) {
   return res;
 
   revalidatePath("/");
+}
+
+export async function findAllUsers(search: string) {
+  const searchPattern = `%${search}%`;
+
+  try {
+    const allUsers = await db
+      .select({
+        id: users.id,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        email: users.email,
+        createdAt: users.createdAt,
+        role: roles.role,
+      })
+      .from(users)
+      .leftJoin(roles, eq(users.role, roles.id))
+      .where(
+        ilike(users.firstName, searchPattern) ||
+          ilike(users.lastName, searchPattern) ||
+          ilike(users.email, searchPattern),
+      );
+
+    return allUsers as User[];
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    return [] as User[];
+  }
 }
