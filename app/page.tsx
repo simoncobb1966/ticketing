@@ -43,20 +43,16 @@ export default function HomePage() {
     const res = await upsertUser(user);
     console.log("res", res);
     if (!res) {
-      setTimeout(() => {
-        toast(
-          id.id ? "User has not been updated" : "User has not been created",
-          "error",
-        );
-      });
+      toast(
+        id.id ? "User has not been updated" : "User has not been created",
+        "error",
+      );
       return;
     } else {
-      setTimeout(() => {
-        toast(
-          id.id ? "User has been updated" : "User has been created",
-          "success",
-        );
-      });
+      toast(
+        id.id ? "User has been updated" : "User has been created",
+        "success",
+      );
     }
 
     await fetchUsers();
