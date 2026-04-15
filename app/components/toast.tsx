@@ -33,7 +33,7 @@ const toast = (
         sonnerToast.success(message, params);
         break;
       case "error":
-        sonnerToast.error(message);
+        sonnerToast.error(message, params);
         break;
       case "warning":
         sonnerToast.warning(message, params);

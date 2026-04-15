@@ -8,19 +8,14 @@ import {
 } from "@/app/actions/user";
 import { Button } from "@/components/ui/button";
 import toast from "@/app/components/toast";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { getAllRoles } from "./actions/roles";
 import { useEffect, useState } from "react";
 import { Role, User } from "@/db/schema";
 import { UserModal } from "./components/userModal";
+import * as z from "zod";
+
+export const DOMAIN = "tesburys.co.uk";
+export const PASSWORD = "admin";
 
 export default function HomePage() {
   const [users, setUsers] = useState<User[]>([]);
@@ -36,35 +31,55 @@ export default function HomePage() {
       id.id = selectedUser.id;
     }
 
+    const firstName = userData.get("firstName") as string;
+    const lastName = userData.get("lastName") as string;
+
     let user = {
-      firstName: userData.get("firstName") as string,
-      lastName: userData.get("lastName") as string,
+      firstName,
+      lastName,
+      email: `${firstName}.${lastName}@${DOMAIN}`,
+      password: PASSWORD,
       role: selectedRole as string,
-      email: userData.get("email") as string,
-      // password: userData.get("password") as string
-      password: "admin",
+      // email: userData.get("email") as string,
+      // password: userData.get("password") as string,
     };
 
     user = { ...user, ...id };
 
-    const res = await upsertUser(user);
-    console.log("res", res);
-    if (!res) {
-      toast(
-        id.id ? "User has not been updated" : "User has not been created",
-        "error",
-      );
-      return;
-    } else {
-      toast(
-        id.id ? "User has been updated" : "User has been created",
-        "success",
-      );
-    }
+    const userValidation = z.object({
+      firstName: z.string("Invalid First Name"),
+      lastName: z.string("Invalid Lastst Name"),
+      email: z.email("Invalid Email address"),
+      password: z.string("Invalid Password"),
+      role: z.union(roles.map((role) => z.string(role.role))),
+      id: z.optional(z.uuidv4()),
+    });
 
-    await fetchUsers();
-    setSelectedUser(null);
-    setSelectedRole("");
+    const result = userValidation.safeParse(user);
+    const { success, error } = result;
+    if (!success) {
+      const prettyError = z.prettifyError(error);
+      toast(prettyError, "error");
+    } else {
+      const res = await upsertUser(user);
+      console.log("res", res);
+      if (!res) {
+        toast(
+          id.id ? "User has not been updated" : "User has not been created",
+          "error",
+        );
+        return;
+      } else {
+        toast(
+          id.id ? "User has been updated" : "User has been created",
+          "success",
+        );
+      }
+
+      await fetchUsers();
+      setSelectedUser(null);
+      setSelectedRole("");
+    }
   };
 
   const fetchUsers = async () => {
@@ -78,11 +93,11 @@ export default function HomePage() {
   const editHandler = (user: User) => {
     setSelectedUser(user);
     setSelectedRole(roles.find((role) => role.role === user.role)?.id || "");
+    setIsModalOpen(true);
   };
 
   const deleteHandler = async (id: string) => {
     const res = await deleteUser(id);
-    console.log("delete res", res);
     toast(`${res[0].firstName} ${res[0].lastName} has been deleted`, "success");
     await fetchUsers();
   };
@@ -111,17 +126,17 @@ export default function HomePage() {
   }, []);
 
   return (
-    // <main className="max-w-lg mx-auto mt-16 px-4">
-    <main className=" mx-auto mt-16 px-4">
+    <main className="max-w-lg mt-16 px-4">
       <h1 className="text-2xl font-semibold mb-6">CRUD Users</h1>
       <p>TODO</p>
-      <p>Validate inputs</p>
       <p>Testing, start with delete user</p>
       <p>Sort by date created/updated</p>
       <p>Soft Delete</p>
       <p>Pagination</p>
+      <p>Add a department table and add a dept field to User</p>
       <p>Look at db return values</p>
       <p>Skeleton</p>
+      <p>Uplaod an avatar to an S3 bucket via a Lambda function</p>
 
       <form className="flex gap-2 items-center my-2" action={searchHandler}>
         <input
@@ -171,16 +186,21 @@ export default function HomePage() {
         Add User
       </Button>
 
-      <UserModal
-        open={isModalOpen}
-        close={() => setIsModalOpen(false)}
-        title={selectedUser ? "Edit User" : "Add User"}
-        upsertUserHandler={upsertUserHandler}
-        selectedUser={selectedUser}
-        roles={roles}
-        selectedRole={selectedRole}
-        setSelectedRole={setSelectedRole}
-      />
+      {isModalOpen && (
+        <UserModal
+          open
+          close={() => {
+            setSelectedUser(null);
+            setIsModalOpen(false);
+          }}
+          title={selectedUser ? "Edit User" : "Add User"}
+          upsertUserHandler={upsertUserHandler}
+          selectedUser={selectedUser}
+          roles={roles}
+          selectedRole={selectedRole}
+          setSelectedRole={setSelectedRole}
+        />
+      )}
     </main>
   );
 }

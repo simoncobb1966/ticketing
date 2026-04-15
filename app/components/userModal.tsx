@@ -5,11 +5,9 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Field, FieldGroup } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -23,7 +21,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Role, roles, User } from "@/db/schema";
+import { Role, User } from "@/db/schema";
+import { useState } from "react";
+import { DOMAIN, PASSWORD } from "../page";
 
 type Props = {
   close: () => void;
@@ -46,20 +46,16 @@ export function UserModal({
   roles,
   title,
 }: Props) {
+  const [firstName, setFirstName] = useState(selectedUser?.firstName ?? "");
+  const [lastName, setLastName] = useState(selectedUser?.lastName ?? "");
+
   return (
     <Dialog open={open} onOpenChange={close}>
-      {/* <DialogTrigger asChild> */}
-      {/* <Button variant="outline">Open Dialog</Button> */}
-      {/* </DialogTrigger> */}
-      <DialogContent className="sm:max-w-sm">
+      <DialogContent className="sm:max-w-sm" aria-describedby={undefined}>
         <DialogClose asChild={true} onClick={close} />
 
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
-          {/* <DialogDescription>
-              Make changes to your profile here. Click save when you&apos;re
-              done.
-            </DialogDescription> */}
         </DialogHeader>
         <form
           action={(data) => {
@@ -72,6 +68,9 @@ export function UserModal({
             <Field>
               <Label htmlFor="name-first">First Name</Label>
               <Input
+                onChange={(event) => {
+                  setFirstName(event.target.value);
+                }}
                 id="name-first"
                 name="firstName"
                 placeholder="First name..."
@@ -81,45 +80,58 @@ export function UserModal({
             <Field>
               <Label htmlFor="name-last">Last Name</Label>
               <Input
+                onChange={(event) => {
+                  setLastName(event.target.value);
+                }}
                 id="name-last"
                 name="lastName"
                 placeholder="Last name..."
                 defaultValue={selectedUser ? selectedUser.lastName : ""}
               />
             </Field>
-            <Field>
+            {/* <Field>
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
                 name="email"
                 placeholder="Email..."
-                defaultValue={selectedUser ? selectedUser.email : ""}
+                value={`${firstName}.${lastName}@${DOMAIN}`}
+                defaultValue={`${firstName}.${lastName}@${DOMAIN}`}
+                disabled
               />
-            </Field>
-            <Select
-              name="role"
-              value={selectedRole}
-              onValueChange={(value) => setSelectedRole(value)}
-            >
-              <SelectTrigger className="w-full max-w-48">
-                <SelectValue placeholder="Select a role" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>Role</SelectLabel>
-
-                  {roles.map((role) => (
-                    <SelectItem value={role.id} key={role.id}>
-                      {role.role}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-            {/* <Field>
-              <Label htmlFor="username-1">Username</Label>
-              <Input id="username-1" name="username" defaultValue="@peduarte" />
             </Field> */}
+            {/* <Field>
+              <Label htmlFor="email">Password</Label>
+              <Input
+                id="email"
+                name="email"
+                placeholder="Email..."
+                defaultValue={PASSWORD}
+                disabled
+              />
+            </Field> */}
+            <div className="mb-4">
+              <Select
+                name="role"
+                value={selectedRole}
+                onValueChange={(value) => setSelectedRole(value)}
+              >
+                <SelectTrigger className="w-full max-w-48">
+                  <SelectValue placeholder="Select a role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>Role</SelectLabel>
+
+                    {roles.map((role) => (
+                      <SelectItem value={role.id} key={role.id}>
+                        {role.role}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
           </FieldGroup>
           <DialogFooter>
             <DialogClose asChild>
