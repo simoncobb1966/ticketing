@@ -10,9 +10,10 @@ import { Button } from "@/components/ui/button";
 import toast from "@/app/components/toast";
 import { getAllRoles } from "./actions/roles";
 import { useEffect, useState } from "react";
-import { Role, User } from "@/db/schema";
-import { UserModal } from "./components/userModal";
+import { Role } from "@/db/schema";
+import UserModal from "./components/userModal/userModal";
 import * as z from "zod";
+import { User } from "@/types/User";
 
 export const DOMAIN = "tesburys.co.uk";
 export const PASSWORD = "admin";
@@ -24,6 +25,7 @@ export default function HomePage() {
   const [selectedRole, setSelectedRole] = useState<string>("");
   const [searchString, setSearchString] = useState<string>("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [sortAlphabetically, setSortAlphabetically] = useState(true);
 
   const upsertUserHandler = async (userData: FormData) => {
     const id: { id?: string } = {};
@@ -42,6 +44,7 @@ export default function HomePage() {
       role: selectedRole as string,
       // email: userData.get("email") as string,
       // password: userData.get("password") as string,
+      updatedAt: new Date(),
     };
 
     user = { ...user, ...id };
@@ -83,7 +86,7 @@ export default function HomePage() {
   };
 
   const fetchUsers = async () => {
-    setUsers(await getAllUsers());
+    setUsers(await getAllUsers(sortAlphabetically));
   };
 
   const fetchRoles = async () => {
@@ -129,6 +132,8 @@ export default function HomePage() {
     <main className="max-w-lg mt-16 px-4">
       <h1 className="text-2xl font-semibold mb-6">CRUD Users</h1>
       <p>TODO</p>
+      <p>VITEST - remove JEST stuff first</p>
+      <p>Look at Front End Masters project to see what tanstack does</p>
       <p>Testing, start with delete user</p>
       <p>Sort by date created/updated</p>
       <p>Soft Delete</p>
@@ -157,6 +162,21 @@ export default function HomePage() {
         <p className="my-2">{`Search results for "${searchString}"`}</p>
       )}
 
+      <div className="mb-2 flex justify-between">
+        <Button variant="secondary" onClick={() => setIsModalOpen(true)}>
+          Add User
+        </Button>
+        <Button
+          variant="secondary"
+          onClick={async () => {
+            setUsers(await getAllUsers(!sortAlphabetically));
+            setSortAlphabetically((prev) => !prev);
+          }}
+        >
+          {sortAlphabetically ? "Sort By Created/Updated" : "Sort by Name"}
+        </Button>
+      </div>
+
       {/* Users list */}
       <ul className="space-y-2 mb-2">
         {users.map((user) => (
@@ -166,7 +186,7 @@ export default function HomePage() {
           >
             <div className="flex justify-between w-full">
               <div className="flex">
-                {`${user.firstName} ${user.lastName} ${user.role}`}
+                {`${user.firstName} ${user.lastName} ${user.role} ${user.updatedAt}`}
               </div>
               <div className="flex gap-2">
                 <Button onClick={() => editHandler(user)}>Edit</Button>
@@ -181,10 +201,6 @@ export default function HomePage() {
           </li>
         ))}
       </ul>
-
-      <Button variant="secondary" onClick={() => setIsModalOpen(true)}>
-        Add User
-      </Button>
 
       {isModalOpen && (
         <UserModal

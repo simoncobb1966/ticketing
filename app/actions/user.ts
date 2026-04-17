@@ -2,12 +2,12 @@
 "use server";
 
 import { db } from "@/db/db";
-import { roles, User, users } from "@/db/schema";
-import { eq, ilike, or } from "drizzle-orm";
+import { roles, users } from "@/db/schema";
+import { eq, ilike, or, asc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-import { NewUser } from "@/types/newUser";
+import { User } from "@/types/User";
 
-export async function getAllUsers() {
+export async function getAllUsers(sortAlphabetically: boolean) {
   try {
     const allUsers = await db
       .select({
@@ -19,7 +19,8 @@ export async function getAllUsers() {
         role: roles.role,
       })
       .from(users)
-      .leftJoin(roles, eq(users.role, roles.id));
+      .leftJoin(roles, eq(users.role, roles.id))
+      .orderBy(sortAlphabetically ? asc(users.lastName) : asc(users.updatedAt));
 
     return allUsers as User[];
   } catch (error) {
@@ -28,7 +29,9 @@ export async function getAllUsers() {
   }
 }
 
-export async function upsertUser(userData: NewUser) {
+type UpsertUserType = Omit<User, "id"> & { id?: string };
+
+export async function upsertUser(userData: UpsertUserType) {
   let user;
 
   try {

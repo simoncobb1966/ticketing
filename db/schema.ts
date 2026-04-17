@@ -11,7 +11,7 @@ import { rolesSeed } from "./seed";
 
 // --- Enums ---
 // export const roleEnum = pgEnum("role", [roleType.user, roleType.admin, roleType.guest]);
-export const roleEnum = pgEnum("role", ['user', 'admin', 'guest']);
+export const roleEnum = pgEnum("role", ["user", "admin", "guest"]);
 
 // --- Roles Table ---
 export const roles = pgTable("roles", {
@@ -21,16 +21,17 @@ export const roles = pgTable("roles", {
 
 // --- Users Table ---
 export const users = pgTable("users", {
-  id: uuid("id").primaryKey().defaultRandom(),
+  id: uuid("id").primaryKey().defaultRandom().notNull(),
   firstName: varchar("first_name", { length: 255 }).notNull(),
   lastName: varchar("last_name", { length: 255 }).notNull(),
   email: varchar("email", { length: 255 }).notNull().unique(),
   password: text("password").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
   role: uuid("role_id")
-        .notNull()
-        .references(() => roles.id)
-        .default(rolesSeed[2].id),
+    .notNull()
+    .references(() => roles.id)
+    .default(rolesSeed[2].id),
 });
 
 // --- Relations ---
@@ -52,7 +53,7 @@ export const usersRelations = relations(users, ({ one }) => ({
 // export type NewUser = typeof users.$inferInsert;
 // export type Role = typeof roles.$inferSelect;
 // export type NewRole = typeof roles.$inferInsert;
-export type User = InferSelectModel<typeof users>;
+// export type User = InferSelectModel<typeof users>;
 // export type UserWithPassword = InferSelectModel<typeof users>;
 // export type User = Omit<UserWithPassword, "password">;
 export type Role = InferSelectModel<typeof roles>;

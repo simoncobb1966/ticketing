@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/select";
 import { Role, User } from "@/db/schema";
 import { useState } from "react";
-import { DOMAIN, PASSWORD } from "../page";
+import { DOMAIN, PASSWORD } from "../../page";
 
 type Props = {
   close: () => void;
@@ -36,7 +36,7 @@ type Props = {
   setSelectedRole: (roleId: string) => void;
 };
 
-export function UserModal({
+export default function UserModal({
   close,
   open,
   upsertUserHandler,
