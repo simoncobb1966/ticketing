@@ -1,5 +1,5 @@
 {
-  "id": "bcefbe4d-1b2e-4184-8693-c0467344c20d",
+  "id": "16d18c1e-47a7-4131-8d20-809e7dc313cd",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -66,11 +66,26 @@
           "primaryKey": false,
           "notNull": true
         },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
         "role_id": {
           "name": "role_id",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "'531ab4f5-308a-4bc9-a266-0a4fe397f0b6'"
         }
       },
       "indexes": {},

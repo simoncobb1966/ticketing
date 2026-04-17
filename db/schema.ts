@@ -31,7 +31,8 @@ export const users = pgTable("users", {
   role: uuid("role_id")
     .notNull()
     .references(() => roles.id)
-    .default(rolesSeed[2].id),
+    .default("9aac5f68-0eda-47ce-98ac-c74ad76a2348"),
+  // .default("admin"),
 });
 
 // --- Relations ---

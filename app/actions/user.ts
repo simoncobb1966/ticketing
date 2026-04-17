@@ -15,7 +15,7 @@ export async function getAllUsers(sortAlphabetically: boolean) {
         firstName: users.firstName,
         lastName: users.lastName,
         email: users.email,
-        createdAt: users.createdAt,
+        updatedAt: users.updatedAt,
         role: roles.role,
       })
       .from(users)

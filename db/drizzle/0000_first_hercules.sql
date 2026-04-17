@@ -10,7 +10,9 @@ CREATE TABLE "users" (
 	"last_name" varchar(255) NOT NULL,
 	"email" varchar(255) NOT NULL,
 	"password" text NOT NULL,
-	"role_id" uuid NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL,
+	"role_id" uuid DEFAULT '531ab4f5-308a-4bc9-a266-0a4fe397f0b6' NOT NULL,
 	CONSTRAINT "users_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint
