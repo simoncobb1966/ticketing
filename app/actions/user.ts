@@ -54,14 +54,13 @@ export async function upsertUser(userData: UpsertUserType) {
 }
 
 export async function deleteUser(id: string) {
-  const res = await db.delete(users).where(eq(users.id, id)).returning({
-    id: users.id,
-    firstName: users.firstName,
-    lastName: users.lastName,
-  });
-
-  return res;
-
+  try {
+    const res = await db.delete(users).where(eq(users.id, id)).returning();
+    return res;
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    return "Failed to delete user";
+  }
   revalidatePath("/");
 }
 
@@ -75,7 +74,7 @@ export async function findAllUsers(search: string) {
         firstName: users.firstName,
         lastName: users.lastName,
         email: users.email,
-        createdAt: users.createdAt,
+        updatedAt: users.updatedAt,
         role: roles.role,
       })
       .from(users)
@@ -84,6 +83,7 @@ export async function findAllUsers(search: string) {
         or(
           ilike(users.firstName, searchPattern),
           ilike(users.lastName, searchPattern),
+          ilike(users.email, searchPattern),
         ),
       );
 

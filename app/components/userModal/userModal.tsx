@@ -21,7 +21,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Role, User } from "@/db/schema";
+import { Role } from "@/db/schema";
+import { User } from "@/types/User";
 import { useState } from "react";
 import { DOMAIN, PASSWORD } from "../../page";
 

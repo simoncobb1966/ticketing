@@ -7,10 +7,8 @@ import {
   timestamp,
 } from "drizzle-orm/pg-core";
 import { InferSelectModel, relations } from "drizzle-orm";
-import { rolesSeed } from "./seed";
 
 // --- Enums ---
-// export const roleEnum = pgEnum("role", [roleType.user, roleType.admin, roleType.guest]);
 export const roleEnum = pgEnum("role", ["user", "admin", "guest"]);
 
 // --- Roles Table ---
@@ -32,7 +30,6 @@ export const users = pgTable("users", {
     .notNull()
     .references(() => roles.id)
     .default("9aac5f68-0eda-47ce-98ac-c74ad76a2348"),
-  // .default("admin"),
 });
 
 // --- Relations ---
@@ -54,7 +51,7 @@ export const usersRelations = relations(users, ({ one }) => ({
 // export type NewUser = typeof users.$inferInsert;
 // export type Role = typeof roles.$inferSelect;
 // export type NewRole = typeof roles.$inferInsert;
-// export type User = InferSelectModel<typeof users>;
+export type User = InferSelectModel<typeof users>;
 // export type UserWithPassword = InferSelectModel<typeof users>;
 // export type User = Omit<UserWithPassword, "password">;
 export type Role = InferSelectModel<typeof roles>;

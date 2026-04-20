@@ -6,5 +6,5 @@ export type User = {
   role: string;
   password: string;
   createdAt?: Date;
-  updatedAt: Date;
+  updatedAt?: Date;
 };

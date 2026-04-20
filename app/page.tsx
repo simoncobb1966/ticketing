@@ -14,6 +14,7 @@ import { Role } from "@/db/schema";
 import UserModal from "./components/userModal/userModal";
 import * as z from "zod";
 import { User } from "@/types/User";
+import { RefreshCwOff } from "lucide-react";
 
 export const DOMAIN = "tesburys.co.uk";
 export const PASSWORD = "admin";
@@ -135,7 +136,9 @@ export default function HomePage() {
       <p>VITEST - remove JEST stuff first</p>
       <p>Look at Front End Masters project to see what tanstack does</p>
       <p>Testing, start with delete user</p>
-      <p>Sort by date created/updated</p>
+      <p>Refresh button</p>
+      <p>Create an API/APIs for all of the b/e code</p>
+      <p>Create AWS Lambda functions for the b/e</p>
       <p>Soft Delete</p>
       <p>Pagination</p>
       <p>Add a department table and add a dept field to User</p>
@@ -156,6 +159,13 @@ export default function HomePage() {
         </Button>
         <Button variant="outline" type="button" onClick={reset}>
           {"Reset"}
+        </Button>
+        <Button
+          onClick={() => {
+            fetchUsers();
+          }}
+        >
+          <RefreshCwOff />
         </Button>
       </form>
       {searchString && (
@@ -186,7 +196,7 @@ export default function HomePage() {
           >
             <div className="flex justify-between w-full">
               <div className="flex">
-                {`${user.firstName} ${user.lastName} ${user.role} ${user.updatedAt}`}
+                {`${user.id} ${user.firstName} ${user.lastName} ${user.role} ${user.updatedAt}`}
               </div>
               <div className="flex gap-2">
                 <Button onClick={() => editHandler(user)}>Edit</Button>
