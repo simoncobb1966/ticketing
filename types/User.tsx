@@ -8,3 +8,5 @@ export type User = {
   createdAt?: Date;
   updatedAt?: Date;
 };
+
+export type KeyOfUser = keyof User;
