@@ -12,15 +12,15 @@ export async function GET(
   try {
     const { id } = await params;
 
-    const user = await db.query.users.findFirst({
+    const res = await db.query.users.findFirst({
       where: eq(users.id, id),
     });
 
-    if (!user) {
+    if (!res) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    return NextResponse.json(user);
+    return NextResponse.json(res);
   } catch (error) {
     console.error("Error fetching user:", error);
     return NextResponse.json(
@@ -42,6 +42,9 @@ export async function DELETE(
     if (isEmpty(res)) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
+
+    return NextResponse.json(res);
+    return;
   } catch (error) {
     return NextResponse.json(
       { error: `${error} Failed to delete user` },
@@ -58,7 +61,7 @@ export async function PATCH(
   const { id } = await params;
   const data = await request.json();
 
-  const patchedUser: Partial<User> = { updatedAt: new Date() };
+  let patchedUser: Partial<User> = {};
   const fields: KeyOfUser[] = ["firstName", "lastName", "email", "role"];
   fields.forEach((field: keyof User) => {
     if (data[field] !== undefined) {
@@ -66,12 +69,20 @@ export async function PATCH(
     }
   });
 
+  if (isEmpty(patchedUser)) {
+    return NextResponse.json(
+      { error: "Inavlid data, no fields" },
+      { status: 404 },
+    );
+  }
+
+  patchedUser = { ...patchedUser, updatedAt: new Date() };
+
   if (
     patchedUser?.role &&
     !allRoles.map((role) => role.id).includes(patchedUser.role)
   ) {
-    console.error("Error updating user, role is invalid");
-    return "Error updating user, role is invalid";
+    return NextResponse.json({ error: "Invalid Role" }, { status: 404 });
   }
 
   try {
@@ -79,7 +90,9 @@ export async function PATCH(
 
     return NextResponse.json(res);
   } catch (error) {
-    console.error("Error updating user:", error);
-    return error;
+    return NextResponse.json(
+      { error: `Error updating user ${error}` },
+      { status: 404 },
+    );
   }
 }

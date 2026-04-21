@@ -24,10 +24,10 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const allRoles: Role[] = await db.select().from(roles);
-
   try {
     const data = await request.json();
+
+    const allRoles: Role[] = await db.select().from(roles);
 
     const userValidation = z.object({
       firstName: z.string("Invalid First Name"),
@@ -38,8 +38,8 @@ export async function POST(request: Request) {
       id: z.optional(z.uuidv4()),
     });
 
-    const result = userValidation.safeParse(data);
-    const { success, error } = result;
+    const validationResult = userValidation.safeParse(data);
+    const { success, error } = validationResult;
     if (!success) {
       const prettyError = z.prettifyError(error);
       return NextResponse.json(

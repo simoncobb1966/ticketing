@@ -102,7 +102,13 @@ export default function HomePage() {
 
   const deleteHandler = async (id: string) => {
     const res = await deleteUser(id);
-    toast(`${res[0].firstName} ${res[0].lastName} has been deleted`, "success");
+    if (Array.isArray(res)) {
+      const deletedUser = res[0];
+      toast(
+        `${deletedUser.firstName} ${deletedUser.lastName} has been deleted`,
+        "success",
+      );
+    }
     await fetchUsers();
   };
 
@@ -137,7 +143,7 @@ export default function HomePage() {
       <p>Look at Front End Masters project to see what tanstack does</p>
       <p>Testing, start with delete user</p>
       <p>Refresh button</p>
-      <p>Create an API/APIs for all of the b/e code</p>
+      <p>Finish API, do validation & error handling</p>
       <p>Create AWS Lambda functions for the b/e</p>
       <p>Soft Delete</p>
       <p>Pagination</p>
