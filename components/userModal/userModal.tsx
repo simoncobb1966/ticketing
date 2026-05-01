@@ -24,7 +24,8 @@ import {
 import { Role } from "@/db/schema";
 import { User } from "@/types/User";
 import { useState } from "react";
-import { DOMAIN, PASSWORD } from "../../page";
+// import { DOMAIN, PASSWORD } from "../../page";
+import { DOMAIN, PASSWORD } from "@/app/page";
 
 type Props = {
   close: () => void;
@@ -67,12 +68,12 @@ export default function UserModal({
         >
           <FieldGroup>
             <Field>
-              <Label htmlFor="name-first">First Name</Label>
+              <Label htmlFor="name_first">First Name</Label>
               <Input
                 onChange={(event) => {
                   setFirstName(event.target.value);
                 }}
-                id="name-first"
+                id="name_first"
                 name="firstName"
                 placeholder="First name..."
                 defaultValue={selectedUser ? selectedUser.firstName : ""}

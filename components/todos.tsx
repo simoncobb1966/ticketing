@@ -3,7 +3,7 @@ import { FC, useState } from "react";
 import { todoType } from "@/types/todoType";
 import Todo from "./todo";
 import AddTodo from "./addTodo";
-import { addTodo, deleteTodo, editTodo, toggleTodo } from "@/app/actions/todo";
+import { addTodo, deleteTodo, editTodo, toggleTodo } from "@/actions/todo";
 
 interface Props {
   todos: todoType[];

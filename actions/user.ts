@@ -1,4 +1,3 @@
-// app/actions.ts — Server Actions
 "use server";
 
 import { db } from "@/db/db";
@@ -29,7 +28,7 @@ export async function getAllUsers(sortAlphabetically: boolean) {
   }
 }
 
-type UpsertUserType = Omit<User, "id"> & { id?: string };
+export type UpsertUserType = Omit<User, "id"> & { id?: string };
 
 export async function upsertUser(userData: UpsertUserType) {
   let user;
@@ -44,24 +43,33 @@ export async function upsertUser(userData: UpsertUserType) {
         .where(eq(users.id, userData.id));
     }
 
+    revalidatePath("/");
     return user.rowCount;
   } catch (error) {
     console.error("Error upserting user:", error);
     return error;
   }
-
-  revalidatePath("/");
 }
 
-export async function deleteUser(id: string) {
-  try {
-    const res = await db.delete(users).where(eq(users.id, id)).returning();
-    return res;
-  } catch (error) {
-    console.error("Error deleting user:", error);
-    return "Failed to delete user";
+export async function deleteUser(id: string | string[]) {
+  if (typeof id === "string") {
+    try {
+      const res = await db.delete(users).where(eq(users.id, id)).returning();
+      revalidatePath("/");
+      return res;
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      return "Failed to delete user";
+    }
+  } else {
+    deleteManyUsers(id);
   }
-  revalidatePath("/");
+}
+
+export async function deleteManyUsers(id: string[]) {
+  id.forEach((userId) => {
+    deleteUser(userId);
+  });
 }
 
 export async function findAllUsers(search: string) {
