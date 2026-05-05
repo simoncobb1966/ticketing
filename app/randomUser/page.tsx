@@ -4,7 +4,7 @@ import Image from "next/image";
 import AddToDatabase from "./addToDatabase";
 
 export default async function Page() {
-  const qtyUsers = 5;
+  const qtyUsers = 10;
   const getData = async () => {
     await mockDelay(1);
     const res = await fetch(`https://randomuser.me/api/?results=${qtyUsers}`);
@@ -16,9 +16,9 @@ export default async function Page() {
   const randomUsers = await getData();
 
   return (
-    <div className="h-stretch border-4 border-orange-500 mb-5 flex flex-col">
-      <h1>Random User!!!</h1>
-      <div className="overflow-y-scroll h-stretch border-4 border-blue-500">
+    <div className="flex flex-col h-full h-stretch justify-between overflow-hidden">
+      <div className="stretch overflow-y-scroll">
+        <h1>Random Users Component</h1>
         {randomUsers.map((user) => {
           const { email, name, picture } = user;
           return (
@@ -37,7 +37,9 @@ export default async function Page() {
           );
         })}
       </div>
-      <AddToDatabase users={randomUsers} />
+      <div className="p-4">
+        <AddToDatabase users={randomUsers} />
+      </div>
     </div>
   );
 }

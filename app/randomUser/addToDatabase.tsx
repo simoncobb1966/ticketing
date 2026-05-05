@@ -33,9 +33,5 @@ export default function AddToDatabase({ users }: Props) {
     });
   };
 
-  return (
-    <Button className="mt-4" onClick={addToDatabase}>
-      Add To Database
-    </Button>
-  );
+  return <Button onClick={addToDatabase}>Add To Database</Button>;
 }
