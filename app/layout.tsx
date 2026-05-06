@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "sonner";
 import NavBar from "@/components/ui/navBar";
 import Footer from "@/components/ui/footer";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,12 +32,14 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body>
-        <NavBar />
-        <div className="flex flex-col h-[calc(100vh_-_72px)] border-solid border-4 border-cyan-500">
-          {children}
-        </div>
-        <Footer />
-        <Toaster />
+        <TooltipProvider>
+          <NavBar />
+          <div className="flex flex-col h-[calc(100vh_-_72px)] border-solid border-4 border-cyan-500">
+            {children}
+          </div>
+          <Footer />
+          <Toaster />
+        </TooltipProvider>
       </body>
     </html>
   );

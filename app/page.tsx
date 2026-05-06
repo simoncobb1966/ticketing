@@ -15,6 +15,11 @@ import UserModal from "@/components/userModal/userModal";
 import * as z from "zod";
 import { User } from "@/types/User";
 import { CircleX, RefreshCwOff } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 // import Image from "next/image";
 
 export const DOMAIN = "tesburys.co.uk";
@@ -150,6 +155,7 @@ export default function HomePage() {
       <p>Look at Front End Masters project to see what tanstack does</p>
       <p>Testing, start with delete user</p>
       <p>Create AWS Lambda functions for the b/e</p>
+      <p>ADD MULTIPLE ENDPOINT</p>
       <p>Soft Delete</p>
       <p>Pagination</p>
       <p>Add a department table and add a dept field to User</p>
@@ -177,12 +183,28 @@ export default function HomePage() {
         <Button variant="outline" type="button" onClick={reset}>
           {"Reset"}
         </Button>
-        <Button onClick={fetchUsers}>
-          <RefreshCwOff />
-        </Button>
-        <Button onClick={deleteAllUsers}>
-          <CircleX />
-        </Button>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button onClick={fetchUsers}>
+              <RefreshCwOff />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Refresh</p>
+          </TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button onClick={deleteAllUsers}>
+              <CircleX />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Delete All</p>
+          </TooltipContent>
+        </Tooltip>
       </form>
       {searchString && (
         <p className="my-2">{`Search results for "${searchString}"`}</p>
@@ -212,7 +234,8 @@ export default function HomePage() {
           >
             <div className="flex justify-between w-full">
               <div className="flex">
-                {`${user.id} ${user.firstName} ${user.lastName} ${user.role} ${user.updatedAt}`}
+                {/* {`${user.id} ${user.firstName} ${user.lastName} ${user.role} ${user.updatedAt}`} */}
+                {`${user.firstName} ${user.lastName} ${user.role}`}
               </div>
               <div className="flex gap-2">
                 <Button onClick={() => editHandler(user)}>Edit</Button>
