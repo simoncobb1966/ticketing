@@ -33,11 +33,10 @@ export async function getAllUsers(sortAlphabetically: boolean) {
 export type UpsertUserType = Omit<User, "id"> & { id?: string };
 
 export async function insertMultipleUsers(usersData: string) {
-  const parsedData: Record<string, UpsertUserType[]> =
-    await JSON.parse(usersData);
+  const parsedData: UpsertUserType[] = await JSON.parse(usersData);
 
-  const validateUsers = async (users: Record<string, UpsertUserType[]>) => {
-    if (users?.newUsers && Array.isArray(users.newUsers)) {
+  const validateUsers = async (users: UpsertUserType[]) => {
+    if (Array.isArray(users)) {
       const allRoles: Role[] = await db.select().from(roles);
 
       const userValidation = z.object({
@@ -49,7 +48,7 @@ export async function insertMultipleUsers(usersData: string) {
         id: z.optional(z.uuidv4()),
       });
 
-      users.newUsers.forEach((user) => {
+      users.forEach((user) => {
         const validationResult = userValidation.safeParse(user);
         const { success, error } = validationResult;
         if (!success) {
@@ -70,27 +69,26 @@ export async function insertMultipleUsers(usersData: string) {
 
   try {
     validateUsers(parsedData);
-    const insertedUsers = await db
-      .insert(users)
-      .values(parsedData.newUsers)
-      .returning();
+    const insertedUsers = await db.insert(users).values(parsedData).returning();
     return insertedUsers;
   } catch (error) {
     console.error("Error inserting multiple users:", error);
   }
 }
 
-export async function upsertUser(userData: UpsertUserType) {
+export async function upsertUser(userData: string) {
+  const parsedData: UpsertUserType = await JSON.parse(userData);
+  console.log("parsedData", parsedData);
   let user;
 
   try {
-    if (!userData.id) {
-      user = await db.insert(users).values(userData);
+    if (!parsedData.id) {
+      user = await db.insert(users).values(parsedData);
     } else {
       user = await db
         .update(users)
-        .set(userData)
-        .where(eq(users.id, userData.id));
+        .set({ ...parsedData, updatedAt: new Date() })
+        .where(eq(users.id, parsedData.id));
     }
 
     revalidatePath("/");

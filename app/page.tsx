@@ -51,7 +51,6 @@ export default function HomePage() {
       role: selectedRole as string,
       // email: userData.get("email") as string,
       // password: userData.get("password") as string,
-      updatedAt: new Date(),
     };
 
     user = { ...user, ...id };
@@ -71,8 +70,7 @@ export default function HomePage() {
       const prettyError = z.prettifyError(error);
       toast(prettyError, "error");
     } else {
-      const res = await upsertUser(user);
-      console.log("res", res);
+      const res = await upsertUser(JSON.stringify(user));
       if (!res) {
         toast(
           id.id ? "User has not been updated" : "User has not been created",
@@ -155,7 +153,6 @@ export default function HomePage() {
       <p>Look at Front End Masters project to see what tanstack does</p>
       <p>Testing, start with delete user</p>
       <p>Create AWS Lambda functions for the b/e</p>
-      <p>ADD MULTIPLE ENDPOINT</p>
       <p>Soft Delete</p>
       <p>Pagination</p>
       <p>Add a department table and add a dept field to User</p>

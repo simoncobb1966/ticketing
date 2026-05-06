@@ -12,7 +12,7 @@ type Props = {
 
 export default function AddToDatabase({ users }: Props) {
   const insertUsers = async (newUsers: UpsertUserType[]) => {
-    const usersToInsertJson = JSON.stringify({ newUsers: newUsers });
+    const usersToInsertJson = JSON.stringify(newUsers);
     return await insertMultipleUsers(usersToInsertJson);
   };
 
