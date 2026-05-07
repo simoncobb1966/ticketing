@@ -8,7 +8,7 @@ import {
 } from "@/actions/user";
 import { Button } from "@/components/ui/button";
 import toast from "@/components/toast";
-import { getAllRoles } from "../actions/roles";
+import { getAllRoles } from "@/actions/roles";
 import { useEffect, useState } from "react";
 import { Role } from "@/db/schema";
 import UserModal from "@/components/userModal/userModal";
@@ -149,25 +149,6 @@ export default function HomePage() {
 
   return (
     <main className="px-4 overflow-y-auto w-full">
-      <h1 className="text-2xl font-semibold mb-6">CRUD Users</h1>
-      <p>TODO</p>
-      <p>VITEST - remove JEST stuff first</p>
-      <p>Look at Front End Masters project to see what tanstack does</p>
-      <p>Testing, start with delete user</p>
-      <p>Create AWS Lambda functions for the b/e</p>
-      <p>Soft Delete</p>
-      <p>Pagination</p>
-      <p>Add a department table and add a dept field to User</p>
-      <p>Look at db return values</p>
-      <p>Skeleton</p>
-      <p>Uplaod an avatar to an S3 bucket via a Lambda function</p>
-      {/* <img
-        src="https://lambdasam-a4dde144fc-eu-west-2.s3.eu-west-2.amazonaws.com/simon_cobb.jpeg"
-        alt="simon_cobb"
-        width={80}
-        height={50}
-      /> */}
-
       <form className="flex gap-2 items-center my-2" action={searchHandler}>
         <input
           name="search"

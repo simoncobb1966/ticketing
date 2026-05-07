@@ -20,7 +20,7 @@ export default function AddToDatabase({ users }: Props) {
     const usersToInsert: UpsertUserType[] = users.map((user) => ({
       firstName: user.name.first,
       lastName: user.name.last,
-      email: `${user.name.first}.${user.name.last}@test.com`,
+      email: `${user.name.first}.${user.name.last}@test.com`.toLowerCase(),
       role: rolesSeed[0].id,
       password: "admin",
     }));

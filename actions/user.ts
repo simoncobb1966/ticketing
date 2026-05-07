@@ -2,7 +2,7 @@
 
 import { db } from "@/db/db";
 import { roles, users, Role } from "@/db/schema";
-import { eq, ilike, or, asc } from "drizzle-orm";
+import { eq, ilike, or, asc, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { User } from "@/types/User";
 import z from "zod";
@@ -87,7 +87,7 @@ export async function upsertUser(userData: string) {
     } else {
       user = await db
         .update(users)
-        .set({ ...parsedData, updatedAt: new Date() })
+        .set(parsedData)
         .where(eq(users.id, parsedData.id));
     }
 
@@ -99,24 +99,18 @@ export async function upsertUser(userData: string) {
   }
 }
 
-export async function deleteManyUsers(id: string[]) {
-  id.forEach((userId) => {
-    deleteUser(userId);
-  });
-}
-
-export async function deleteUser(id: string | string[]) {
-  if (typeof id === "string") {
-    try {
-      const res = await db.delete(users).where(eq(users.id, id)).returning();
-      revalidatePath("/");
-      return res;
-    } catch (error) {
-      console.error("Error deleting user:", error);
-      return "Failed to delete user";
-    }
-  } else {
-    deleteManyUsers(id);
+export async function deleteUser(id: string) {
+  const parsedData: string[] = await JSON.parse(id);
+  try {
+    const res = await db
+      .delete(users)
+      .where(inArray(users.id, parsedData))
+      .returning();
+    revalidatePath("/");
+    return res;
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    return "Failed to delete user";
   }
 }
 

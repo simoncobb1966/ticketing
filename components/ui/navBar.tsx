@@ -1,9 +1,33 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import Link from "next/link";
+import { LogOut, LogIn } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import useUserContext from "@/components/contexts/userContext/useUserContext";
+// import { rolesSeed } from "@/constants/seedData";
 
 export default function NavBar() {
-  console.log("navbar");
+  const { user, handleSetUser } = useUserContext();
+  const [page, setPage] = useState("Home");
 
+  const logout = () => {
+    // handleSetUser({
+    //   id: "046bc5ff-bf66-44b8-bef0-df83c50da918",
+    //   firstName: "Bob",
+    //   lastName: "Cobb",
+    //   email: "Erika.Charles@tesburys.co.uk",
+    //   role: rolesSeed[0].id,
+    //   password: "admin",
+    // });
+    handleSetUser(null);
+  };
   const buttons = [
     {
       label: "Home",
@@ -13,28 +37,61 @@ export default function NavBar() {
       label: "Add Users",
       href: "/randomUser",
     },
+    {
+      label: "Admin",
+      href: "/admin",
+    },
   ];
+
+  let initials = "";
+  if (user) {
+    initials +=
+      user?.firstName.charAt(0).toUpperCase() +
+      user?.lastName.charAt(0).toUpperCase();
+  }
 
   const height = 64 / 4;
 
   return (
     <>
       <div
-        className={`flex gap-2 p-4 border-b-4 border-t-4 fixed top-0 left-0 bg-white w-full }`}
+        className={`h-${height} box-border justify-between flex p-4 border-b-1 border-black fixed top-0 left-0 bg-white w-full`}
       >
-        {buttons.map((link) => {
-          return (
-            <Link
-              key={link.href}
-              className="border-2 border-solid px-2"
-              href={link.href}
-            >
-              {link.label}
-            </Link>
-          );
-        })}
+        <div className="flex gap-2">
+          {buttons.map((link) => {
+            return (
+              <Link
+                onNavigate={() => {
+                  setPage(link.label);
+                }}
+                key={link.href}
+                className={`border-2 border-solid px-2 ${page === link.label ? "bg-red-500" : ""}`}
+                href={link.href}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
+        </div>
+
+        <div className="flex gap-2">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button onClick={logout} className="bg-transparent">
+                {user ? <LogOut color="red" /> : <LogIn color="green" />}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{user ? "Log Out" : "Log In"}</p>
+            </TooltipContent>
+          </Tooltip>
+
+          <Avatar>
+            <AvatarFallback className="text-xs">{initials}</AvatarFallback>
+          </Avatar>
+        </div>
       </div>
-      <div className={`w-full h-${height} border-b-4 border-t-4`}></div>
+      <div className="w-full h-16" />
     </>
   );
 }
