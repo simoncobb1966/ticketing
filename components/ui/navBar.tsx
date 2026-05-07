@@ -11,22 +11,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import useUserContext from "@/components/contexts/userContext/useUserContext";
-// import { rolesSeed } from "@/constants/seedData";
 
 export default function NavBar() {
-  const { user, handleSetUser } = useUserContext();
+  const { user, setUser } = useUserContext();
   const [page, setPage] = useState("Home");
 
   const logout = () => {
-    // handleSetUser({
-    //   id: "046bc5ff-bf66-44b8-bef0-df83c50da918",
-    //   firstName: "Bob",
-    //   lastName: "Cobb",
-    //   email: "Erika.Charles@tesburys.co.uk",
-    //   role: rolesSeed[0].id,
-    //   password: "admin",
-    // });
-    handleSetUser(null);
+    setUser(null);
   };
   const buttons = [
     {

@@ -5,7 +5,7 @@ import { rolesSeed } from "@/constants/seedData";
 
 interface UserContextProps {
   user: User | null;
-  handleSetUser: (newUser: User | null) => void;
+  setUser: (newUser: User | null) => void;
 }
 
 const testUser: User = {
@@ -22,16 +22,16 @@ const UserContext = createContext<UserContextProps | null>(null);
 const UserContextProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [user, setUser] = useState<User | null>(testUser);
+  const [user, setUserContext] = useState<User | null>(testUser);
 
-  const handleSetUser = useCallback(
-    (newUser: User | null) => setUser(newUser),
+  const setUser = useCallback(
+    (newUser: User | null) => setUserContext(newUser),
     [],
   );
 
   const contextValue = useMemo<UserContextProps>(
-    () => ({ user, handleSetUser }),
-    [user, handleSetUser],
+    () => ({ user, setUser }),
+    [user, setUser],
   );
 
   return (
