@@ -11,21 +11,28 @@ import {
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import useUserContext from "@/components/contexts/userContext/useUserContext";
+import { usePathname } from "next/navigation";
 
 export default function NavBar() {
+  const [page, setPage] = useState<null | string>(null);
+  const pathname = usePathname();
   const { user, setUser } = useUserContext();
-  const [page, setPage] = useState("Home");
+
+  if (!page) {
+    setPage(pathname);
+  }
 
   const logout = () => {
     setUser(null);
   };
+
   const buttons = [
     {
       label: "Home",
       href: "/",
     },
     {
-      label: "Add Users",
+      label: "Random Users",
       href: "/randomUser",
     },
     {
@@ -53,11 +60,13 @@ export default function NavBar() {
             return (
               <Link
                 onNavigate={() => {
-                  setPage(link.label);
+                  if (user) {
+                    setPage(link.href);
+                  }
                 }}
                 key={link.href}
-                className={`border-2 border-solid px-2 ${page === link.label ? "bg-red-500" : ""}`}
-                href={link.href}
+                className={`border-2 border-solid px-2 ${page === link.href ? "bg-red-500" : ""}`}
+                href={user ? link.href : ""}
               >
                 {link.label}
               </Link>
@@ -65,20 +74,30 @@ export default function NavBar() {
           })}
         </div>
 
-        <div className="flex gap-2">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button onClick={logout} className="bg-transparent">
-                {user ? <LogOut color="red" /> : <LogIn color="green" />}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>{user ? "Log Out" : "Log In"}</p>
-            </TooltipContent>
-          </Tooltip>
+        <div className="flex gap-2 items-center">
+          {user && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link
+                  onNavigate={() => {
+                    setUser(null);
+                    setPage(buttons[0].href);
+                  }}
+                  href={buttons[0].href}
+                >
+                  <LogOut />
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Log Out</p>
+              </TooltipContent>
+            </Tooltip>
+          )}
 
           <Avatar>
-            <AvatarFallback className="text-xs">{initials}</AvatarFallback>
+            <AvatarFallback className="text-xs">
+              <p className="color-cyan-500">{initials}</p>
+            </AvatarFallback>
           </Avatar>
         </div>
       </div>

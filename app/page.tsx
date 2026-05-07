@@ -1,51 +1,45 @@
 "use client";
 
-import {
-  deleteUser,
-  findAllUsers,
-  getAllUsers,
-  upsertUser,
-} from "@/actions/user";
 import { Button } from "@/components/ui/button";
-import toast from "@/components/toast";
-import { getAllRoles } from "../actions/roles";
+import { LogIn, UserPlus } from "lucide-react";
+import { login } from "@/actions/login";
 import { useEffect, useState } from "react";
-import { Role } from "@/db/schema";
+import useUserContext from "@/components/contexts/userContext/useUserContext";
 import UserModal from "@/components/userModal/userModal";
-import * as z from "zod";
-import { User } from "@/types/User";
-import { CircleX, RefreshCwOff } from "lucide-react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-// import Image from "next/image";
+import z from "zod";
+import toast from "@/components/toast";
+import { Role } from "@/db/schema";
+import { getAllRoles } from "@/actions/roles";
+import { upsertUser } from "@/actions/user";
 
 export const DOMAIN = "test.com";
 export const PASSWORD = "admin";
 
 export default function HomePage() {
-  const [users, setUsers] = useState<User[]>([]);
-  const [roles, setRoles] = useState<Role[]>([]);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [selectedRole, setSelectedRole] = useState<string>("");
-  const [searchString, setSearchString] = useState<string>("");
+  const { user, setUser } = useUserContext();
+  const [logInError, setLogInError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [sortAlphabetically, setSortAlphabetically] = useState(true);
+  const [selectedRole, setSelectedRole] = useState<string>("");
+  const [roles, setRoles] = useState<Role[]>([]);
 
-  console.log("users", users);
+  const loginHandler = async (data: FormData) => {
+    const email = data.get("email") as string;
+    const password = data.get("password") as string;
 
-  const upsertUserHandler = async (userData: FormData) => {
-    const id: { id?: string } = {};
-    if (selectedUser) {
-      id.id = selectedUser.id;
+    const res = await login(email.trim(), password);
+    if (res) {
+      setUser({ ...res, role: res.role || "user" });
+      setLogInError(null);
+    } else {
+      setLogInError("Invalid email or password");
     }
+  };
 
+  const addNewUserHandler = async (userData: FormData) => {
     const firstName = userData.get("firstName") as string;
     const lastName = userData.get("lastName") as string;
 
-    let user = {
+    const user = {
       firstName,
       lastName,
       email: `${firstName}.${lastName}@${DOMAIN}`,
@@ -55,7 +49,7 @@ export default function HomePage() {
       // password: userData.get("password") as string,
     };
 
-    user = { ...user, ...id };
+    // user = { ...user, ...id };
 
     const userValidation = z.object({
       firstName: z.string("Invalid First Name"),
@@ -73,74 +67,23 @@ export default function HomePage() {
       toast(prettyError, "error");
     } else {
       const res = await upsertUser(JSON.stringify(user));
-      if (!res) {
-        toast(
-          id.id ? "User has not been updated" : "User has not been created",
-          "error",
-        );
+      if (typeof res !== "number" || res !== 1) {
+        toast(`User has not been created ${res}`, "error");
         return;
       } else {
-        toast(
-          id.id ? "User has been updated" : "User has been created",
-          "success",
-        );
+        toast("User has been created", "success");
       }
 
-      await fetchUsers();
-      setSelectedUser(null);
       setSelectedRole("");
     }
-  };
-
-  const fetchUsers = async () => {
-    setUsers(await getAllUsers(sortAlphabetically));
   };
 
   const fetchRoles = async () => {
     setRoles(await getAllRoles());
   };
 
-  const editHandler = (user: User) => {
-    setSelectedUser(user);
-    setSelectedRole(roles.find((role) => role.role === user.role)?.id || "");
-    setIsModalOpen(true);
-  };
-
-  const deleteHandler = async (id: string[]) => {
-    const res = await deleteUser(JSON.stringify(id));
-    console.log("res", res);
-    if (Array.isArray(res)) {
-      const deletedUser = res[0];
-      toast(
-        `${deletedUser.firstName} ${deletedUser.lastName} has been deleted`,
-        "success",
-      );
-    }
-    await fetchUsers();
-  };
-
-  const deleteAllUsers = () => {
-    const idsToDelete = users.map((user) => user.id);
-    deleteHandler(idsToDelete);
-  };
-
-  const searchHandler = async (data: FormData) => {
-    const search = data.get("search") as string;
-    setSearchString(search);
-    const foundUsers = await findAllUsers(search);
-    setUsers(foundUsers);
-  };
-
-  const reset = () => {
-    setSearchString("");
-    setSelectedUser(null);
-    setSelectedRole("");
-    fetchUsers();
-  };
-
   useEffect(() => {
     const fetchUsersAndRoles = async () => {
-      await fetchUsers();
       await fetchRoles();
     };
 
@@ -151,6 +94,10 @@ export default function HomePage() {
     <main className="px-4 overflow-y-auto w-full">
       <h1 className="text-2xl font-semibold mb-6">CRUD Users</h1>
       <p>TODO</p>
+      <p>
+        LOOK AT B/E and ensure the data is returned in an object with data:
+        data, error: error
+      </p>
       <p>VITEST - remove JEST stuff first</p>
       <p>Look at Front End Masters project to see what tanstack does</p>
       <p>Testing, start with delete user</p>
@@ -168,98 +115,49 @@ export default function HomePage() {
         height={50}
       /> */}
 
-      <form className="flex gap-2 items-center my-2" action={searchHandler}>
-        <input
-          name="search"
-          placeholder="search ..."
-          className="flex-1 border rounded px-3 py-2 text-sm"
-          required
-          defaultValue={""}
-        />
-        <Button variant="outline" type="submit">
-          {"Search"}
-        </Button>
-        <Button variant="outline" type="button" onClick={reset}>
-          {"Reset"}
-        </Button>
-
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button onClick={fetchUsers}>
-              <RefreshCwOff />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Refresh</p>
-          </TooltipContent>
-        </Tooltip>
-
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button onClick={deleteAllUsers}>
-              <CircleX />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Delete All</p>
-          </TooltipContent>
-        </Tooltip>
-      </form>
-      {searchString && (
-        <p className="my-2">{`Search results for "${searchString}"`}</p>
-      )}
-
-      <div className="mb-2 flex justify-between">
-        <Button variant="secondary" onClick={() => setIsModalOpen(true)}>
-          Add User
-        </Button>
-        <Button
-          variant="secondary"
-          onClick={async () => {
-            setUsers(await getAllUsers(!sortAlphabetically));
-            setSortAlphabetically((prev) => !prev);
-          }}
+      {!user && (
+        <form
+          className="flex flex-col gap-2 items-center my-2"
+          action={loginHandler}
         >
-          {sortAlphabetically ? "Sort By Created/Updated" : "Sort by Name"}
-        </Button>
-      </div>
+          <input
+            name="email"
+            placeholder="email ..."
+            className="flex-1 border rounded px-3 py-2 text-sm"
+            required
+            defaultValue={""}
+          />
 
-      {/* Users list */}
-      <ul className="space-y-2 mb-2">
-        {users.map((user) => (
-          <li
-            key={user.id}
-            className="flex items-center gap-3 p-3 border rounded"
-          >
-            <div className="flex justify-between w-full">
-              <div className="flex">
-                {/* {`${user.id} ${user.firstName} ${user.lastName} ${user.role} ${user.updatedAt}`} */}
-                {`${user.firstName} ${user.lastName} ${user.email} ${user.role}`}
-              </div>
-              <div className="flex gap-2">
-                <Button onClick={() => editHandler(user)}>Edit</Button>
-                <Button
-                  variant="destructive"
-                  onClick={() => deleteHandler([user.id])}
-                >
-                  Delete
-                </Button>
-              </div>
-            </div>
-          </li>
-        ))}
-      </ul>
+          <input
+            name="password"
+            placeholder="password ..."
+            className="flex-1 border rounded px-3 py-2 text-sm"
+            required
+            defaultValue={""}
+          />
 
+          {logInError && <p className="text-red-500">{logInError}</p>}
+
+          <Button variant="outline" type="submit">
+            <LogIn />
+            {"Log In"}
+          </Button>
+
+          <Button variant="outline" onClick={() => setIsModalOpen(true)}>
+            <UserPlus />
+            {"Add New User"}
+          </Button>
+        </form>
+      )}
       {isModalOpen && (
         <UserModal
           open
           close={() => {
-            setSelectedUser(null);
             setIsModalOpen(false);
           }}
-          title={selectedUser ? "Edit User" : "Add User"}
-          upsertUserHandler={upsertUserHandler}
-          selectedUser={selectedUser}
+          title={"Add User"}
+          upsertUserHandler={addNewUserHandler}
+          selectedUser={null}
           roles={roles}
           selectedRole={selectedRole}
           setSelectedRole={setSelectedRole}

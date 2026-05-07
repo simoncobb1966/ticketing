@@ -18,6 +18,7 @@ export async function getAllUsers(sortAlphabetically: boolean) {
         email: users.email,
         updatedAt: users.updatedAt,
         role: roles.role,
+        password: users.password,
       })
       .from(users)
       .leftJoin(roles, eq(users.role, roles.id))

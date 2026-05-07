@@ -73,9 +73,11 @@ export default function HomePage() {
       toast(prettyError, "error");
     } else {
       const res = await upsertUser(JSON.stringify(user));
-      if (!res) {
+      if (typeof res !== "number" || res !== 1) {
         toast(
-          id.id ? "User has not been updated" : "User has not been created",
+          id.id
+            ? `User has not been updated ${res}`
+            : `User has not been created ${res}`,
           "error",
         );
         return;
@@ -215,7 +217,7 @@ export default function HomePage() {
             <div className="flex justify-between w-full">
               <div className="flex">
                 {/* {`${user.id} ${user.firstName} ${user.lastName} ${user.role} ${user.updatedAt}`} */}
-                {`${user.firstName} ${user.lastName} ${user.email} ${user.role}`}
+                {`${user.firstName} ${user.lastName} ${user.email} ${user.password}`}
               </div>
               <div className="flex gap-2">
                 <Button onClick={() => editHandler(user)}>Edit</Button>

@@ -24,7 +24,6 @@ import {
 import { Role } from "@/db/schema";
 import { User } from "@/types/User";
 import { useState } from "react";
-// import { DOMAIN, PASSWORD } from "../../page";
 import { DOMAIN, PASSWORD } from "@/app/page";
 
 type Props = {
